@@ -53,9 +53,6 @@ class RedisClient
             );
         }
 
-        // UNDOCUMENTED FEATURE: option 8 is REDIS_OPT_REPLY_LITERAL
-        $this->redis->setOption(8, 1);
-
         if ($result === false) {
             throw new RedisClientException(sprintf(
                 'Unable to connect to redis server %s:%s: %s',

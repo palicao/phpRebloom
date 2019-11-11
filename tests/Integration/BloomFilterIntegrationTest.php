@@ -8,27 +8,18 @@ namespace Palicao\PhpRebloom\Tests\Integration;
 use Palicao\PhpRebloom\BloomFilter;
 use Palicao\PhpRebloom\Exception\ErrorRateOutOfBoundsException;
 use Palicao\PhpRebloom\Exception\KeyNotFoundException;
-use Palicao\PhpRebloom\RedisClient;
-use Palicao\PhpRebloom\RedisConnectionParams;
-use PHPUnit\Framework\TestCase;
-use Redis;
 
-class BloomFilterIntegrationTest extends TestCase
+class BloomFilterIntegrationTest extends IntegrationTestCase
 {
-    private $redis;
+    /**
+     * @var BloomFilter
+     */
     private $sut;
 
     public function setUp(): void
     {
-        $host = getenv('REDIS_HOST') ?: 'redis';
-        $port = getenv('REDIS_PORT') ? (int)getenv('REDIS_PORT') : 6379;
-        $this->redis = new Redis();
-        $this->redis->connect($host, $port);
-
-        $connectionParams = new RedisConnectionParams($host, $port);
-        $redisClient = new RedisClient($this->redis, $connectionParams);
-        $redisClient->executeCommand(['FLUSHDB']);
-        $this->sut = new BloomFilter($redisClient);
+        parent::setUp();
+        $this->sut = new BloomFilter($this->redisClient);
     }
 
     public function testReserveCreatesKey(): void

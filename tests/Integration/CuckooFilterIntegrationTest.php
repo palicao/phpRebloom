@@ -5,29 +5,21 @@ declare(strict_types=1);
 
 namespace Palicao\PhpRebloom\Tests\Integration;
 
-use Palicao\PhpRebloom\Exception\KeyNotFoundException;
-use Palicao\PhpRebloom\RedisClient;
-use Palicao\PhpRebloom\RedisConnectionParams;
 use Palicao\PhpRebloom\CuckooFilter;
-use PHPUnit\Framework\TestCase;
-use Redis;
+use Palicao\PhpRebloom\Exception\KeyNotFoundException;
 
-class CuckooFilterIntegrationTest extends TestCase
+class CuckooFilterIntegrationTest extends IntegrationTestCase
 {
-    private $redis;
+
+    /**
+     * @var CuckooFilter
+     */
     private $sut;
 
     public function setUp(): void
     {
-        $host = getenv('REDIS_HOST') ?: 'redis';
-        $port = getenv('REDIS_PORT') ? (int)getenv('REDIS_PORT') : 6379;
-        $this->redis = new Redis();
-        $this->redis->connect($host, $port);
-
-        $connectionParams = new RedisConnectionParams($host, $port);
-        $redisClient = new RedisClient($this->redis, $connectionParams);
-        $redisClient->executeCommand(['FLUSHDB']);
-        $this->sut = new CuckooFilter($redisClient);
+        parent::setUp();
+        $this->sut = new CuckooFilter($this->redisClient);
     }
 
     public function testReserveCreatesKey(): void
