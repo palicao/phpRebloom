@@ -77,26 +77,28 @@ class BloomFilterIntegrationTest extends TestCase
         $this->assertFalse($this->sut->exists('insertMany2Test', 'pineapple'));
     }
 
-    public function testInsertIfKeyExists(): void
+    public function testInsertManyIfKeyExists(): void
     {
-        $this->sut->reserve('insertIfKeyExistsTest', .0001, 100);
-        $this->sut->insertIfKeyExists('insertIfKeyExistsTest', ['pear', 'orange', 'banana']);
-        $this->assertTrue($this->sut->exists('insertIfKeyExistsTest', 'orange'));
-        $this->assertFalse($this->sut->exists('insertIfKeyExistsTest', 'pineapple'));
+        $key = 'insertManyIfKeyExistsTest';
+        $this->sut->reserve($key, .0001, 100);
+        $this->sut->insertManyIfKeyExists($key, ['pear', 'orange', 'banana']);
+        $this->assertTrue($this->sut->exists($key, 'orange'));
+        $this->assertFalse($this->sut->exists($key, 'pineapple'));
     }
 
     public function testInsertIfKeyExistsThrowsExceptionOnMissingKey(): void
     {
         $this->expectException(KeyNotFoundException::class);
-        $this->sut->insertIfKeyExists('missingKey', ['foo', 'bar', 'baz']);
+        $this->sut->insertManyIfKeyExists('missingKey', ['foo', 'bar', 'baz']);
     }
 
     public function testManyExists(): void
     {
-        $this->sut->insertMany('manyExistsTest', ['pear', 'orange', 'banana']);
-        $this->assertEquals([true, true], $this->sut->manyExist('manyExistsTest', ['orange', 'banana']));
-        $this->assertEquals([false, false], $this->sut->manyExist('manyExistsTest', ['pineapple', 'strawberry']));
-        $this->assertEquals([false, true], $this->sut->manyExist('manyExistsTest', ['watermelon', 'orange']));
+        $key = 'manyExistsTest';
+        $this->sut->insertMany($key, ['pear', 'orange', 'banana']);
+        $this->assertEquals([true, true], $this->sut->manyExist($key, ['orange', 'banana']));
+        $this->assertEquals([false, false], $this->sut->manyExist($key, ['pineapple', 'strawberry']));
+        $this->assertEquals([false, true], $this->sut->manyExist($key, ['watermelon', 'orange']));
     }
 
     public function testCopy(): void

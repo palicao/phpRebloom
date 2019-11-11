@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Palicao\PhpRebloom;
 
+use Palicao\PhpRebloom\Exception\KeyNotFoundException;
 use RedisException;
 
 final class CuckooFilter extends BaseFilter
@@ -16,7 +17,7 @@ final class CuckooFilter extends BaseFilter
      * @return bool
      * @throws RedisException
      */
-    public function reserve($key, int $capacity, ?int $bucketSize, ?int $maxIterations, ?int $expansion)
+    public function reserve(string $key, int $capacity, ?int $bucketSize = null, ?int $maxIterations = null, ?int $expansion = null): bool
     {
         $params = ['CF.RESERVE', $key, $capacity];
         if ($bucketSize !== null) {
@@ -36,57 +37,93 @@ final class CuckooFilter extends BaseFilter
 
     /**
      * @param string $key
-     * @param string[] $values
-     * @param bool $allowDuplicates
+     * @param string $value
+     * @param bool $allowDuplicateValues
      * @param int|null $capacity
-     * @return bool[]
+     * @return bool
      * @throws RedisException
      */
-    public function insertMany(string $key, array $values, bool $allowDuplicates = false, ?int $capacity = null): array
+    public function insert(string $key, string $value, bool $allowDuplicateValues = true, ?int $capacity = null): bool
     {
-        return $this->doInsert($key, $values, $allowDuplicates, true, $capacity);
+        $result = $this->doInsert($key, [$value], $allowDuplicateValues, true, $capacity);
+        return array_pop($result);
     }
 
     /**
      * @param string $key
      * @param string[] $values
-     * @param bool $allowDuplicates
+     * @param bool $allowDuplicateValues
      * @param int|null $capacity
      * @return bool[]
      * @throws RedisException
      */
-    public function insertIfKeyExists(string $key, array $values, bool $allowDuplicates = false, ?int $capacity = null): array
+    public function insertMany(string $key, array $values, bool $allowDuplicateValues = true, ?int $capacity = null): array
     {
-        return $this->doInsert($key, $values, $allowDuplicates, false, $capacity);
+        return $this->doInsert($key, $values, $allowDuplicateValues, true, $capacity);
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     * @param bool $allowDuplicateValues
+     * @param int|null $capacity
+     * @return bool
+     * @throws RedisException
+     */
+    public function insertIfKeyExists(string $key, string $value, bool $allowDuplicateValues = true, ?int $capacity = null): bool
+    {
+        $result = $this->doInsert($key, [$value], $allowDuplicateValues, false, $capacity);
+        return array_pop($result);
     }
 
     /**
      * @param string $key
      * @param string[] $values
-     * @param bool $allowDuplicates
+     * @param bool $allowDuplicateValues
+     * @param int|null $capacity
+     * @return bool[]
+     * @throws RedisException
+     */
+    public function insertManyIfKeyExists(string $key, array $values, bool $allowDuplicateValues = true, ?int $capacity = null): array
+    {
+        return $this->doInsert($key, $values, $allowDuplicateValues, false, $capacity);
+    }
+
+    /**
+     * @param string $key
+     * @param string[] $values
+     * @param bool $allowDuplicateValues
      * @param bool $createKey
      * @param int|null $capacity
      * @return bool[]
      * @throws RedisException
      */
-    private function doInsert(string $key, array $values, bool $allowDuplicates, bool $createKey, ?int $capacity): array
+    private function doInsert(string $key, array $values, bool $allowDuplicateValues, bool $createKey, ?int $capacity): array
     {
-        $affix = $allowDuplicates ? '' : 'NX';
+        $affix = $allowDuplicateValues ? '' : 'NX';
 
         $count = count($values);
         if ($count === 0) {
             return [];
         }
-        if ($capacity === null && $count === 1) {
+        if ($capacity === null && $count === 1 && $createKey) {
             return $this->toBool([$this->client->executeCommand(['CF.ADD' . $affix, $key, array_pop($values)])]);
         }
 
-        $params = ['CF.INSERT' . $affix, $key, 'CAPACITY', $capacity];
+        $params = ['CF.INSERT' . $affix, $key];
+        if ($capacity !== null) {
+            $params[] = 'CAPACITY';
+            $params[] = $capacity;
+        }
         if (!$createKey) {
             $params[] = 'NOCREATE';
         }
         $params[] = 'ITEMS';
-        return $this->toBool($this->client->executeCommand(array_merge($params, $values)));
+        $result = $this->client->executeCommand(array_merge($params, $values));
+        if ($result === false) {
+            throw new KeyNotFoundException(sprintf('Key %s does not exist', $key));
+        }
+        return $this->toBool($result);
     }
 
     /**

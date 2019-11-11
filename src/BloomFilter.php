@@ -76,11 +76,23 @@ final class BloomFilter extends BaseFilter
 
     /**
      * @param string $key
+     * @param string $value
+     * @return bool
+     * @throws RedisException
+     */
+    public function insertIfKeyExists(string $key, string $value): bool
+    {
+        $result = $this->insertManyIfKeyExists($key, [$value]);
+        return array_pop($result);
+    }
+
+    /**
+     * @param string $key
      * @param string[] $values
      * @return bool[]
      * @throws RedisException
      */
-    public function insertIfKeyExists(string $key, array $values): array
+    public function insertManyIfKeyExists(string $key, array $values): array
     {
         if (count($values) === 0) {
             return [];
