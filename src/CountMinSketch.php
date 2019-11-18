@@ -7,16 +7,8 @@ use Palicao\PhpRebloom\Exception\KeyNotFoundException;
 use Palicao\PhpRebloom\Exception\RedisClientException;
 use RedisException;
 
-final class CountMinSketch
+final class CountMinSketch extends BaseFrequencyCount
 {
-    /** @var RedisClient */
-    protected $client;
-
-    public function __construct(RedisClient $redisClient)
-    {
-        $this->client = $redisClient;
-    }
-
     /**
      * @param string $key
      * @param int $width
@@ -26,7 +18,9 @@ final class CountMinSketch
      */
     public function initByDimensions(string $key, int $width, int $depth): bool
     {
-        return $this->client->executeCommand(['CMS.INITBYDIM', $key, $width, $depth]);
+        return $this->parseResult(
+            $this->client->executeCommand(['CMS.INITBYDIM', $key, $width, $depth])
+        );
     }
 
     /**
@@ -38,7 +32,9 @@ final class CountMinSketch
      */
     public function initByProbability(string $key, float $error, float $probability): bool
     {
-        return $this->client->executeCommand(['CMS.INITBYPROB', $key, $error, $probability]);
+        return $this->parseResult(
+            $this->client->executeCommand(['CMS.INITBYPROB', $key, $error, $probability])
+        );
     }
 
     /**
@@ -46,7 +42,6 @@ final class CountMinSketch
      * @param Pair ...$pairs
      * @return bool
      * @throws RedisException
-     * @throws RedisClientException
      */
     public function incrementBy(string $key, Pair ...$pairs): bool
     {
@@ -56,7 +51,7 @@ final class CountMinSketch
             $params[] = $pair->getValue();
         }
         try {
-            return $this->client->executeCommand($params);
+            return $this->parseResult($this->client->executeCommand($params));
         } catch (RedisException $exception) {
             $this->parseException($exception, $key);
         }
@@ -93,14 +88,14 @@ final class CountMinSketch
      * @throws RedisClientException
      * @throws KeyNotFoundException
      */
-    public function merge(string $destinationKey, array $sourceKeysWeightMap): bool
+    public function merge(string $destinationKey, array $sourceKeysWeightMap)
     {
         try {
             $count = count($sourceKeysWeightMap);
             $sourceKeys = array_keys($sourceKeysWeightMap);
             $weights = array_values($sourceKeysWeightMap);
             $params = array_merge(['CMS.MERGE', $destinationKey, $count], $sourceKeys, ['WEIGHTS'], $weights);
-            return $this->client->executeCommand($params);
+            return $this->parseResult($this->client->executeCommand($params));
         } catch (RedisException $exception) {
             $this->parseException($exception);
         }
@@ -125,20 +120,4 @@ final class CountMinSketch
             return new CountMinSketchInfo($key, $result[1], $result[3], $result[5]);
         }
     }
-
-    /**
-     * @param RedisException $exception
-     * @param string $key
-     * @throws RedisException
-     * @throws KeyNotFoundException
-     */
-    private function parseException(RedisException $exception, ?string $key = null): void
-    {
-        if (stripos($exception->getMessage(), 'key does not exist') !== false) {
-            $msg = $key !== null ? sprintf('Key %s does not exist', $key) : 'Key does not exist';
-            throw new KeyNotFoundException($msg);
-        }
-        throw $exception;
-    }
-
 }

@@ -17,15 +17,6 @@ abstract class BaseFilter
     }
 
     /**
-     * @param array $result
-     * @return bool[]
-     */
-    protected function toBool(array $result): array
-    {
-        return array_map('boolval', $result);
-    }
-
-    /**
      * @param string $key
      * @param string $type
      * @return array

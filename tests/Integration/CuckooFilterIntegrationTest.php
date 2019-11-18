@@ -10,7 +10,6 @@ use Palicao\PhpRebloom\Exception\KeyNotFoundException;
 
 class CuckooFilterIntegrationTest extends IntegrationTestCase
 {
-
     /**
      * @var CuckooFilter
      */

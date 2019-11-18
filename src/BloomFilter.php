@@ -56,7 +56,7 @@ final class BloomFilter extends BaseFilter
             } else {
                 $result = $this->client->executeCommand(array_merge(['BF.MADD', $key], $values));
             }
-            return $this->toBool($result);
+            return ArrayUtils::toBool($result);
         }
 
         $params = ['BF.INSERT', $key];
@@ -71,7 +71,7 @@ final class BloomFilter extends BaseFilter
         }
 
         $result = $this->client->executeCommand(array_merge($params, ['ITEMS'], $values));
-        return $this->toBool($result);
+        return ArrayUtils::toBool($result);
     }
 
     /**
@@ -101,7 +101,7 @@ final class BloomFilter extends BaseFilter
         if ($result === false) {
             throw new KeyNotFoundException(sprintf('Key %s does not exist', $key));
         }
-        return $this->toBool($result);
+        return ArrayUtils::toBool($result);
     }
 
     /**
@@ -126,7 +126,7 @@ final class BloomFilter extends BaseFilter
         if (count($values) === 0) {
             return [];
         }
-        return $this->toBool($this->client->executeCommand(array_merge(['BF.MEXISTS', $key], $values)));
+        return ArrayUtils::toBool($this->client->executeCommand(array_merge(['BF.MEXISTS', $key], $values)));
     }
 
     /**

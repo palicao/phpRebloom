@@ -25,20 +25,35 @@ class CountMinSketchIntegrationTest extends IntegrationTestCase
 
     public function testInitByDimensions(): void
     {
-        $this->sut->initByDimensions('initByDim', 3000, 40);
+        $key = 'initByDim';
+        $result = $this->sut->initByDimensions($key, 3000, 40);
+        $this->assertTrue($result);
+        $info = $this->sut->info($key);
+        $this->assertEquals($key, $info->getKey());
+        $this->assertEquals(3000, $info->getWidth());
+        $this->assertEquals(40, $info->getDepth());
     }
 
     public function testInitByProbability(): void
     {
-        $this->sut->initByProbability('initByProb', .001, .01);
+        $key = 'initByProb';
+        $result = $this->sut->initByProbability($key, .001, .01);
+        $this->assertTrue($result);
+        $info = $this->sut->info($key);
+        $this->assertEquals($key, $info->getKey());
+        $this->assertEquals(2000, $info->getWidth());
+        $this->assertEquals(7, $info->getDepth());
     }
 
     public function testIncrementBy(): void
     {
         $key = 'incrementByTest';
         $this->sut->initByDimensions($key, 3000, 40);
-        $this->sut->incrementBy($key, new Pair('a', 100), new Pair('b', 200));
-        $this->sut->incrementBy($key, new Pair('a', 20), new Pair('b', 10));
+        $result1 = $this->sut->incrementBy($key, new Pair('a', 100), new Pair('b', 200));
+        $result2 = $this->sut->incrementBy($key, new Pair('a', 20), new Pair('b', 10));
+
+        $this->assertTrue($result1);
+        $this->assertTrue($result2);
 
         $expected = [new Pair('a', 120), new Pair('b', 210)];
         $this->assertEquals($expected, $this->sut->query($key, 'a', 'b'));

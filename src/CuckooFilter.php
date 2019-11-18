@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Palicao\PhpRebloom;
 
 use Palicao\PhpRebloom\Exception\KeyNotFoundException;
+use PHPUnit\Framework\StaticAnalysis\HappyPath\AssertNotInstanceOf\A;
 use RedisException;
 
 final class CuckooFilter extends BaseFilter
@@ -107,7 +108,7 @@ final class CuckooFilter extends BaseFilter
             return [];
         }
         if ($capacity === null && $count === 1 && $createKey) {
-            return $this->toBool([$this->client->executeCommand(['CF.ADD' . $affix, $key, array_pop($values)])]);
+            return ArrayUtils::toBool([$this->client->executeCommand(['CF.ADD' . $affix, $key, array_pop($values)])]);
         }
 
         $params = ['CF.INSERT' . $affix, $key];
@@ -123,7 +124,7 @@ final class CuckooFilter extends BaseFilter
         if ($result === false) {
             throw new KeyNotFoundException(sprintf('Key %s does not exist', $key));
         }
-        return $this->toBool($result);
+        return ArrayUtils::toBool($result);
     }
 
     /**

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Palicao\PhpRebloom;
 
-class RedisConnectionParams
+final class RedisConnectionParams
 {
     /** @var bool */
     private $persistentConnection;

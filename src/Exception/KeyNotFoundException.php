@@ -5,6 +5,6 @@ namespace Palicao\PhpRebloom\Exception;
 
 use InvalidArgumentException;
 
-class KeyNotFoundException extends InvalidArgumentException
+final class KeyNotFoundException extends InvalidArgumentException
 {
 }

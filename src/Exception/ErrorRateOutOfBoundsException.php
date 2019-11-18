@@ -5,6 +5,6 @@ namespace Palicao\PhpRebloom\Exception;
 
 use OutOfBoundsException;
 
-class ErrorRateOutOfBoundsException extends OutOfBoundsException
+final class ErrorRateOutOfBoundsException extends OutOfBoundsException
 {
 }

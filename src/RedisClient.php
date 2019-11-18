@@ -18,6 +18,10 @@ class RedisClient
     public function __construct(Redis $redis, RedisConnectionParams $connectionParams)
     {
         $this->redis = $redis;
+
+        // UNDOCUMENTED FEATURE: option 8 is REDIS_OPT_REPLY_LITERAL
+        $this->redis->setOption(8, 1);
+
         $this->connectionParams = $connectionParams;
     }
 

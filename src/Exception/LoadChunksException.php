@@ -5,6 +5,6 @@ namespace Palicao\PhpRebloom\Exception;
 
 use RuntimeException;
 
-class LoadChunksException extends RuntimeException
+final class LoadChunksException extends RuntimeException
 {
 }
