@@ -15,6 +15,7 @@ build:
     coverage:
       environment:
         php:
+          version: 7.2
           pecl_extensions:
             - redis
         variables:
