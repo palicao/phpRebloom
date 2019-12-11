@@ -5,7 +5,7 @@ namespace Palicao\PhpRebloom;
 
 use RedisException;
 
-final class TopK extends BaseFrequencyCount
+final class TopK extends BaseFrequencyCounter
 {
     /**
      * @param string $key
@@ -65,50 +65,69 @@ final class TopK extends BaseFrequencyCount
     /**
      * @param string $key
      * @param string ...$items
-     * @return bool[]
+     * @return string[] A subset of $items containing the elements found in the top-k
      * @throws RedisException
      */
     public function query(string $key, string ... $items): array
     {
+        $out = [];
         try {
-            return ArrayUtils::toBool(
-                $this->client->executeCommand(array_merge(['TOPK.QUERY', $key], $items))
-            );
+            $result = $this->client->executeCommand(array_merge(['TOPK.QUERY', $key], $items));
+            $resultCount = count($result);
+            for ($i = 0; $i < $resultCount; $i++) {
+                if (isset($items[$i]) && $result[$i] === 1) {
+                    $out[] = $items[$i];
+                }
+            }
+
         } catch (RedisException $exception) {
             $this->parseException($exception, $key);
         }
-        return [];
+        return $out;
     }
 
     /**
      * @param string $key
      * @param string ...$items
-     * @return int[]
+     * @return Pair[] A subset of $items containing the elements found in the top-k with their approximate count
      * @throws RedisException
      */
     public function count(string $key, string ... $items): array
     {
+        $out = [];
         try {
-            return $this->client->executeCommand(array_merge(['TOPK.COUNT', $key], $items));
+            $result = $this->client->executeCommand(array_merge(['TOPK.COUNT', $key], $items));
+            $resultCount = count($result);
+            for ($i = 0; $i < $resultCount; $i++) {
+                if (isset($items[$i])) {
+                    $out[] = new Pair($items[$i], (int)$result[$i]);
+                }
+            }
         } catch (RedisException $exception) {
             $this->parseException($exception, $key);
         }
-        return [];
+        return $out;
     }
 
     /**
      * @param string $key
-     * @return string[]
+     * @return Pair[] The top-k items with their relative position
      * @throws RedisException
      */
     public function list(string $key): array
     {
+        $out = [];
         try {
-            return $this->client->executeCommand(['TOPK.LIST', $key]);
+            $result = $this->client->executeCommand(['TOPK.LIST', $key]);
+            foreach ($result as $position => $item) {
+                if ($item !== false) {
+                    $out[] = new Pair($item, (int)$position);
+                }
+            }
         } catch (RedisException $exception) {
             $this->parseException($exception, $key);
         }
-        return [];
+        return $out;
     }
 
     /**
@@ -123,8 +142,7 @@ final class TopK extends BaseFrequencyCount
             $result = $this->client->executeCommand(['TOPK.INFO', $key]);
         } catch (RedisException $exception) {
             $this->parseException($exception, $key);
-        } finally {
-            return new TopKInfo($key, (int) $result[1], (int) $result[3], (int) $result[5], (float) $result[7]);
         }
+        return new TopKInfo($key, (int)$result[1], (int)$result[3], (int)$result[5], (float)$result[7]);
     }
 }

@@ -7,7 +7,7 @@ use Palicao\PhpRebloom\Exception\KeyNotFoundException;
 use Palicao\PhpRebloom\Exception\RedisClientException;
 use RedisException;
 
-final class CountMinSketch extends BaseFrequencyCount
+final class CountMinSketch extends BaseFrequencyCounter
 {
     /**
      * @param string $key
@@ -88,7 +88,7 @@ final class CountMinSketch extends BaseFrequencyCount
      * @throws RedisClientException
      * @throws KeyNotFoundException
      */
-    public function merge(string $destinationKey, array $sourceKeysWeightMap)
+    public function merge(string $destinationKey, array $sourceKeysWeightMap) : bool
     {
         try {
             $count = count($sourceKeysWeightMap);
@@ -116,8 +116,7 @@ final class CountMinSketch extends BaseFrequencyCount
             $result = $this->client->executeCommand(['CMS.INFO', $key]);
         } catch (RedisException $exception) {
             $this->parseException($exception, $key);
-        } finally {
-            return new CountMinSketchInfo($key, $result[1], $result[3], $result[5]);
         }
+        return new CountMinSketchInfo($key, $result[1], $result[3], $result[5]);
     }
 }

@@ -7,6 +7,7 @@ namespace Palicao\PhpRebloom\Tests\Integration;
 
 use Palicao\PhpRebloom\CountMinSketch;
 use Palicao\PhpRebloom\CountMinSketchInfo;
+use Palicao\PhpRebloom\Exception\KeyNotFoundException;
 use Palicao\PhpRebloom\Pair;
 
 class CountMinSketchIntegrationTest extends IntegrationTestCase
@@ -59,6 +60,18 @@ class CountMinSketchIntegrationTest extends IntegrationTestCase
         $this->assertEquals($expected, $this->sut->query($key, 'a', 'b'));
     }
 
+    public function testIncrementByOnNonExistingKey(): void
+    {
+        $this->expectException(KeyNotFoundException::class);
+        $this->sut->incrementBy('nonExistingKey', new Pair('item', 1));
+    }
+
+    public function testQueryOnNonExistingKey(): void
+    {
+        $this->expectException(KeyNotFoundException::class);
+        $this->sut->query('nonExistingKey', 'item');
+    }
+
     public function testMerge(): void
     {
         $this->sut->initByDimensions('source1', 3000, 40);
@@ -74,6 +87,12 @@ class CountMinSketchIntegrationTest extends IntegrationTestCase
 
         $expected = [new Pair('a', 130), new Pair('b', 60), new Pair('c', 150)];
         $this->assertEquals($expected, $this->sut->query('destination', 'a', 'b', 'c'));
+    }
+
+    public function testMergeNonExistingKey(): void
+    {
+        $this->expectException(KeyNotFoundException::class);
+        $this->sut->merge('dest', ['src' => 1]);
     }
 
     public function testInfo(): void

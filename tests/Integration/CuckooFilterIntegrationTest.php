@@ -21,10 +21,23 @@ class CuckooFilterIntegrationTest extends IntegrationTestCase
         $this->sut = new CuckooFilter($this->redisClient);
     }
 
-    public function testReserveCreatesKey(): void
+    public function testReserveAndInfo(): void
     {
-        $this->sut->reserve('reserve', 1000);
-        $this->assertTrue((bool)$this->redis->exists('reserve'));
+        $key = 'reserve';
+        $this->assertTrue($this->sut->reserve($key, 200, 10, 20, 2));
+        $this->assertTrue((bool)$this->redis->exists($key));
+
+        $info = $this->sut->info($key);
+        $this->assertEquals($key, $info->getKey(), 'Wrong key');
+        $this->assertEquals(376, $info->getSize(), 'Wrong size');
+        $this->assertEquals(10, $info->getBucketSize(), 'Wrong bucket size');
+        $this->assertEquals(0, $info->getDeletedItems(), 'Wrong deleted items');
+        $this->assertEquals(0, $info->getInsertedItems(), 'Wrong inserted items');
+        $this->assertEquals(2, $info->getExpansionRate(), 'Wrong expansion rate');
+        $this->assertEquals(20, $info->getMaxIterations(), 'Wrong max iterations');
+        $this->assertEquals(32, $info->getNumBuckets(), 'Wrong num buckets');
+        $this->assertEquals(1, $info->getNumFilters(), 'Wrong num filters');
+
     }
 
     public function testInsert(): void
@@ -43,13 +56,20 @@ class CuckooFilterIntegrationTest extends IntegrationTestCase
         $this->assertFalse($this->sut->exists($key, 'monkey'));
     }
 
-    public function testInsertIfKeyExistsThrowsExceptionOnNonExistingKey(): void
+    public function testInsertIfKeyExists(): void
+    {
+        $key = 'testInsertIfKeyExists';
+        $this->sut->reserve($key, 10);
+        $this->assertTrue($this->sut->insertIfKeyExists($key, 'foo'));
+    }
+
+    public function testInsertIfKeyExistsOnNonExistingKey(): void
     {
         $this->expectException(KeyNotFoundException::class);
         $this->sut->insertIfKeyExists('insert2Test', 'foo');
     }
 
-    public function testInsertManyIfKeyExistThrowsExceptionOnNonExistingKey(): void
+    public function testInsertManyIfKeyExistOnNonExistingKey(): void
     {
         $this->expectException(KeyNotFoundException::class);
         $this->sut->insertManyIfKeyExists('insertMany2Test', ['foo', 'bar']);
@@ -80,5 +100,11 @@ class CuckooFilterIntegrationTest extends IntegrationTestCase
         $this->sut->copy('copyFrom', 'copyTo');
         $this->assertTrue($this->sut->exists('copyTo', 'fish'));
         $this->assertFalse($this->sut->exists('copyTo', 'monkey'));
+    }
+
+    public function testInfoOnNonExistingKey(): void
+    {
+        $this->expectException(KeyNotFoundException::class);
+        $this->sut->info('nonExistingKey');
     }
 }

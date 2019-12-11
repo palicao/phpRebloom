@@ -78,4 +78,13 @@ abstract class BaseFilter
     {
         $this->loadChunks($destKey, $this->scanDump($sourceKey));
     }
+
+    /**
+     * @param array $result
+     * @return bool[]
+     */
+    protected static function arrayToBool(array $result): array
+    {
+        return array_map('boolval', $result);
+    }
 }

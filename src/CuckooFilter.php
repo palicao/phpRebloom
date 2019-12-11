@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Palicao\PhpRebloom;
 
 use Palicao\PhpRebloom\Exception\KeyNotFoundException;
-use PHPUnit\Framework\StaticAnalysis\HappyPath\AssertNotInstanceOf\A;
 use RedisException;
 
 final class CuckooFilter extends BaseFilter
@@ -108,7 +107,7 @@ final class CuckooFilter extends BaseFilter
             return [];
         }
         if ($capacity === null && $count === 1 && $createKey) {
-            return ArrayUtils::toBool([$this->client->executeCommand(['CF.ADD' . $affix, $key, array_pop($values)])]);
+            return self::arrayToBool([$this->client->executeCommand(['CF.ADD' . $affix, $key, array_pop($values)])]);
         }
 
         $params = ['CF.INSERT' . $affix, $key];
@@ -124,7 +123,7 @@ final class CuckooFilter extends BaseFilter
         if ($result === false) {
             throw new KeyNotFoundException(sprintf('Key %s does not exist', $key));
         }
-        return ArrayUtils::toBool($result);
+        return self::arrayToBool($result);
     }
 
     /**
@@ -158,6 +157,32 @@ final class CuckooFilter extends BaseFilter
     public function count(string $key, string $value): int
     {
         return (int)$this->client->executeCommand(['CF.COUNT', $key, $value]);
+    }
+
+    /**
+     * @param string $key
+     * @return CuckooFilterInfo
+     * @throws RedisException
+     * @throws KeyNotFoundException
+     */
+    public function info(string $key): CuckooFilterInfo
+    {
+        $info = $this->client->executeCommand(['CF.INFO', $key]);
+        if (!is_array($info)) {
+            throw new KeyNotFoundException(sprintf('Key %s does not exist', $key));
+        }
+
+        return new CuckooFilterInfo(
+            $key,
+            $info[1],
+            $info[3],
+            $info[5],
+            $info[7],
+            $info[9],
+            $info[11],
+            $info[13],
+            $info[15]
+        );
     }
 
     /**

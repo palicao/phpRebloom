@@ -19,9 +19,6 @@ class RedisClient
     {
         $this->redis = $redis;
 
-        // UNDOCUMENTED FEATURE: option 8 is REDIS_OPT_REPLY_LITERAL
-        $this->redis->setOption(8, 1);
-
         $this->connectionParams = $connectionParams;
     }
 
@@ -76,6 +73,8 @@ class RedisClient
     public function executeCommand(array $params)
     {
         $this->connectIfNeeded();
+        // UNDOCUMENTED FEATURE: option 8 is REDIS_OPT_REPLY_LITERAL
+        $this->redis->setOption(8, 1);
         return $this->redis->rawCommand(...$params);
     }
 }

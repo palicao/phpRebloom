@@ -5,7 +5,7 @@ namespace Palicao\PhpRebloom;
 use Palicao\PhpRebloom\Exception\KeyNotFoundException;
 use RedisException;
 
-abstract class BaseFrequencyCount
+abstract class BaseFrequencyCounter
 {
     /** @var RedisClient */
     protected $client;
@@ -36,9 +36,6 @@ abstract class BaseFrequencyCount
      */
     protected function parseResult($result): bool
     {
-        if (is_bool($result)) {
-            return $result;
-        }
-        return $result === 'OK';
+        return $result === 'OK' ? true : (bool) $result;
     }
 }

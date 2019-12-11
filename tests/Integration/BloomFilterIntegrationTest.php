@@ -68,6 +68,14 @@ class BloomFilterIntegrationTest extends IntegrationTestCase
         $this->assertFalse($this->sut->exists('insertMany2Test', 'pineapple'));
     }
 
+    public function testInsertIfKeyExists(): void
+    {
+        $key = 'insertIfKeyExistsTest';
+        $this->sut->reserve($key, .0001, 100);
+        $this->sut->insertIfKeyExists($key, 'kiwi');
+        $this->assertTrue($this->sut->exists($key, 'kiwi'));
+    }
+
     public function testInsertManyIfKeyExists(): void
     {
         $key = 'insertManyIfKeyExistsTest';
@@ -77,10 +85,16 @@ class BloomFilterIntegrationTest extends IntegrationTestCase
         $this->assertFalse($this->sut->exists($key, 'pineapple'));
     }
 
-    public function testInsertIfKeyExistsThrowsExceptionOnMissingKey(): void
+    public function testInsertIfKeyExistsOnNonExistingKey(): void
     {
         $this->expectException(KeyNotFoundException::class);
-        $this->sut->insertManyIfKeyExists('missingKey', ['foo', 'bar', 'baz']);
+        $this->sut->insertIfKeyExists('missingKey', 'foo');
+    }
+
+    public function testInsertManyIfKeyExistsOnNonExistingKey(): void
+    {
+        $this->expectException(KeyNotFoundException::class);
+        $this->sut->insertManyIfKeyExists('missingKeyMany', ['foo', 'bar', 'baz']);
     }
 
     public function testManyExists(): void

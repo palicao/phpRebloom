@@ -11,6 +11,6 @@ services:
       - .:/app
   redis:
     container_name: redis
-    image: redislabs/rebloom:2.0.3
+    image: redislabs/rebloom:2.2.0
 
 
