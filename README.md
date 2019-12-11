@@ -7,10 +7,13 @@ Use [Redis Bloom](https://oss.redislabs.com/redisbloom/) with PHP!
 [![Build Status](https://scrutinizer-ci.com/g/palicao/phpRebloom/badges/build.png?b=master)](https://scrutinizer-ci.com/g/palicao/phpRebloom/build-status/master)
 [![Latest Stable Version](https://img.shields.io/packagist/v/palicao/php-rebloom.svg)](https://packagist.org/packages/palicao/php-rebloom)
 
+Disclaimer: this is a very lightweight library. For a battery-included experience,
+please checkout: https://github.com/averias/phpredis-bloom
+
 ## Bloom Filter
 
-A Bloom filter is a space-efficient probabilistic data structure designed to determine whether an element is present in a set.
-False positives are possible.
+A Bloom filter is a space-efficient probabilistic data structure designed to determine
+whether an element is present in a set. False positives are possible.
 
 ```
 $bloomFilter = new BloomFilter(
