@@ -21,7 +21,7 @@ build:
           REDIS_HOST: localhost
       services:
         redis-timeseries:
-          image: redislabs/rebloom:2.0.3
+          image: redislabs/rebloom:2.2.0
           ports:
             - 6379
       tests:
