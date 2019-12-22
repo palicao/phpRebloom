@@ -74,7 +74,8 @@ class RedisClient
     {
         $this->connectIfNeeded();
         // UNDOCUMENTED FEATURE: option 8 is REDIS_OPT_REPLY_LITERAL
-        $this->redis->setOption(8, 1);
+        $value = (PHP_VERSION_ID < 70300) ? '1' : 1;
+        $this->redis->setOption(8, $value);
         return $this->redis->rawCommand(...$params);
     }
 }
