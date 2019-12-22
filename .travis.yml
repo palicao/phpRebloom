@@ -1,7 +1,7 @@
 language: php
 
 php:
-  - 7.2.19
+  - 7.2
   - 7.3
   - 7.4
 
@@ -24,7 +24,8 @@ before_script:
 
 script:
   - composer install
-  - ./vendor/bin/phpunit
+  -  if [ $(phpenv version-name) = "7.4" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then COVERAGE="--coverage-clover build/logs/clover.xml"; fi
+  - ./vendor/bin/phpunit $COVERAGE
   - ./vendor/bin/psalm
 
 after_script:
