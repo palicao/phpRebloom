@@ -25,5 +25,8 @@
                 <directory>./src/Exception</directory>
             </exclude>
         </whitelist>
+        <logging>
+            <log type="coverage-clover" target="build/coverage.xml" />
+        </logging>
     </filter>
 </phpunit>

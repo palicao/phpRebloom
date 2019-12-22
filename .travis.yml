@@ -18,7 +18,6 @@ before_install:
   - docker run -d -p 127.0.0.1:6379:6379 --name redis redislabs/rebloom:2.2.0
   - yes | pecl install igbinary redis || true
   - echo 'extension = redis.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-  - if [ $(phpenv version-name) = "7.2" ]; then phpenv config-rm xdebug.ini; fi
 
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
@@ -27,8 +26,7 @@ before_script:
 
 script:
   - composer install
-  -  if [ $(phpenv version-name) = "7.4" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then COVERAGE="--coverage-clover build/logs/clover.xml"; fi
-  - ./vendor/bin/phpunit $COVERAGE
+  - ./vendor/bin/phpunit
   - ./vendor/bin/psalm
 
 after_script:
