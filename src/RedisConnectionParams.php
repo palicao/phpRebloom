@@ -23,11 +23,15 @@ final class RedisConnectionParams
     /** @var float */
     private $readTimeout;
 
-    public function __construct(string $host = '127.0.0.1', int $port = 6379)
+    /** @var string */
+    private $password;
+
+    public function __construct(string $host = '127.0.0.1', int $port = 6379, string $password = null)
     {
         $this->persistentConnection = false;
         $this->host = $host;
         $this->port = $port;
+        $this->password = $password;
         $this->timeout = 0;
         $this->retryInterval = 0;
         $this->readTimeout = 0.0;
@@ -105,5 +109,10 @@ final class RedisConnectionParams
     public function getReadTimeout(): float
     {
         return $this->readTimeout;
+    }
+
+    public function getPassword(): string
+    {
+        return $this->password;
     }
 }

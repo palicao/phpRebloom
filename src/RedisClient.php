@@ -62,6 +62,9 @@ class RedisClient
                 $this->redis->getLastError() ?? 'unknown error'
             ));
         }
+        if($params->getPassword()) {
+            $this->redis->auth($params->getPassword())
+        }
     }
 
     /**
