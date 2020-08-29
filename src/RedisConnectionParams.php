@@ -26,12 +26,17 @@ final class RedisConnectionParams
     /** @var string */
     private $password;
 
-    public function __construct(string $host = '127.0.0.1', int $port = 6379, string $password = null)
+    /** @var string */
+    private $username; 
+
+
+    public function __construct(string $host = '127.0.0.1', int $port = 6379, string $password = null, string $username = null)
     {
         $this->persistentConnection = false;
         $this->host = $host;
         $this->port = $port;
         $this->password = $password;
+        $this->username = $username;
         $this->timeout = 0;
         $this->retryInterval = 0;
         $this->readTimeout = 0.0;
@@ -114,5 +119,10 @@ final class RedisConnectionParams
     public function getPassword(): string
     {
         return $this->password;
+    }
+
+    public function getUsername(): string
+    {
+        return $this->username;
     }
 }

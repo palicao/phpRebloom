@@ -62,8 +62,10 @@ class RedisClient
                 $this->redis->getLastError() ?? 'unknown error'
             ));
         }
-        if($params->getPassword()) {
-            $this->redis->auth($params->getPassword())
+        if($params->getUsername() && $params->getPassword()) {
+            $this->redis->auth([$params->getUsername(), $params->getPassword()]);
+        } else if ($params->getPassword()) {
+            $this->redis->auth([$params->getPassword()]);
         }
     }
 

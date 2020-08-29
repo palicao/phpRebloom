@@ -24,8 +24,9 @@ abstract class IntegrationTestCase extends TestCase
         $port = getenv('REDIS_PORT') ? (int)getenv('REDIS_PORT') : 6379;
         $this->redis = new Redis();
         $this->redis->connect($host, $port);
-
-        $connectionParams = new RedisConnectionParams($host, $port);
+        $username = getenv('REDIS_USERNAME') ? getenv('REDIS_USERNAME') : null;
+        $password = getenv('REDIS_PASSWORD') ? getenv('REDIS_PASSWORD') : null;
+        $connectionParams = new RedisConnectionParams($host, $port, $password, $username);
         $this->redisClient = new RedisClient($this->redis, $connectionParams);
         $this->redisClient->executeCommand(['FLUSHDB']);
     }
