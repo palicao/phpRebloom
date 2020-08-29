@@ -23,10 +23,10 @@ final class RedisConnectionParams
     /** @var float */
     private $readTimeout;
 
-    /** @var string */
+    /** @var string|null */
     private $password;
 
-    /** @var string */
+    /** @var string|null */
     private $username; 
 
 
