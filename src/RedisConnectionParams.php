@@ -115,13 +115,19 @@ final class RedisConnectionParams
     {
         return $this->readTimeout;
     }
-
-    public function getPassword(): string
+    /**
+     * Password of redis server
+     * @return string|null
+     */
+    public function getPassword(): ?string
     {
         return $this->password;
     }
-
-    public function getUsername(): string
+    /**
+     * User name of the redis serer
+     * @return string|null
+     */
+    public function getUsername(): ?string
     {
         return $this->username;
     }
