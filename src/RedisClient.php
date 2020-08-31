@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Palicao\PhpRebloom;
 
@@ -98,7 +99,7 @@ class RedisClient
                      * @noinspection PhpParamsInspection
                      */
                     $result = $this->redis->auth(
-                        ['user' => $params->getUsername(), 'pass' => $params->getPassword()]
+                        [$params->getUsername(), $params->getPassword()]
                     );
                 } else {
                     /** @psalm-suppress PossiblyNullArgument */
