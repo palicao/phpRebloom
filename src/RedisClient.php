@@ -64,7 +64,7 @@ class RedisClient
             ));
         }
 
-        $this->authenticate($params);
+        $this->authenticate($params->getUsername(), $params->getPassword());
     }
 
     /**
@@ -86,34 +86,31 @@ class RedisClient
     }
 
     /**
-     * @param RedisConnectionParams $params
+     * @param string|null $username
+     * @param string|null $password
      * @throws RedisAuthenticationException
      */
-    private function authenticate(RedisConnectionParams $params): void
+    private function authenticate(?string $username, ?string $password): void
     {
         try {
-            if ($params->getPassword()) {
-                if ($params->getUsername()) {
-                    /**
-                     * @psalm-suppress InvalidArgument
-                     * @noinspection PhpParamsInspection
-                     */
-                    $result = $this->redis->auth(
-                        [$params->getUsername(), $params->getPassword()]
-                    );
+            if ($password) {
+                if ($username) {
+                    // Calling auth() with an array throws a TypeError in some cases
+                    /** @noinspection PhpMethodParametersCountMismatchInspection */
+                    $result = $this->redis->rawCommand('AUTH', $username, $password);
                 } else {
                     /** @psalm-suppress PossiblyNullArgument */
-                    $result = $this->redis->auth($params->getPassword());
+                    $result = $this->redis->auth($password);
                 }
                 if ($result === false) {
                     throw new RedisAuthenticationException(sprintf(
-                        'Failure authenticating user %s', $params->getUsername() ?: 'default'
+                        'Failure authenticating user %s', $username ?: 'default'
                     ));
                 }
             }
         } /** @noinspection PhpRedundantCatchClauseInspection */ catch (RedisException $e) {
             throw new RedisAuthenticationException(sprintf(
-                'Failure authenticating user %s: %s', $params->getUsername() ?: 'default', $e->getMessage()
+                'Failure authenticating user %s: %s', $username ?: 'default', $e->getMessage()
             ));
         }
     }

@@ -14,4 +14,3 @@ RUN pecl install redis && \
 RUN wget https://github.com/composer/composer/releases/download/1.9.1/composer.phar -q &&\
     mv composer.phar /usr/bin/composer && \
     chmod +x /usr/bin/composer
-
