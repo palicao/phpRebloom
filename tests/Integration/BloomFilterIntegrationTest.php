@@ -26,21 +26,21 @@ class BloomFilterIntegrationTest extends IntegrationTestCase
     {
         $this->sut->reserve('reserveTest', .0001, 100);
         $result = (bool)$this->redis->exists('reserveTest');
-        $this->assertTrue($result);
+        self::assertTrue($result);
     }
 
     public function testInsert(): void
     {
         $this->sut->insert('insertTest', 'foo', .0001, 100);
-        $this->assertTrue($this->sut->exists('insertTest', 'foo'));
-        $this->assertFalse($this->sut->exists('insertTest', 'bar'));
+        self::assertTrue($this->sut->exists('insertTest', 'foo'));
+        self::assertFalse($this->sut->exists('insertTest', 'bar'));
     }
 
     public function testInsertWithoutErrorAndCapacity(): void
     {
         $this->sut->insert('insert2Test', 'foo');
-        $this->assertTrue($this->sut->exists('insert2Test', 'foo'));
-        $this->assertFalse($this->sut->exists('insert2Test', 'bar'));
+        self::assertTrue($this->sut->exists('insert2Test', 'foo'));
+        self::assertFalse($this->sut->exists('insert2Test', 'bar'));
     }
 
     public function testErrorOutOfBounds(): void
@@ -52,20 +52,20 @@ class BloomFilterIntegrationTest extends IntegrationTestCase
     public function testInsertMany(): void
     {
         $this->sut->insertMany('insertManyTest', ['pear', 'orange', 'banana'], .0001, 100);
-        $this->assertTrue($this->sut->exists('insertManyTest', 'orange'));
-        $this->assertFalse($this->sut->exists('insertManyTest', 'pineapple'));
+        self::assertTrue($this->sut->exists('insertManyTest', 'orange'));
+        self::assertFalse($this->sut->exists('insertManyTest', 'pineapple'));
     }
 
     public function testInsertManyEmpty(): void
     {
-        $this->assertEquals([], $this->sut->insertMany('insertManyTest', []));
+        self::assertEquals([], $this->sut->insertMany('insertManyTest', []));
     }
 
     public function testInsertManyWithoutErrorAndCapacity(): void
     {
         $this->sut->insertMany('insertMany2Test', ['pear', 'orange', 'banana']);
-        $this->assertTrue($this->sut->exists('insertMany2Test', 'orange'));
-        $this->assertFalse($this->sut->exists('insertMany2Test', 'pineapple'));
+        self::assertTrue($this->sut->exists('insertMany2Test', 'orange'));
+        self::assertFalse($this->sut->exists('insertMany2Test', 'pineapple'));
     }
 
     public function testInsertIfKeyExists(): void
@@ -73,7 +73,7 @@ class BloomFilterIntegrationTest extends IntegrationTestCase
         $key = 'insertIfKeyExistsTest';
         $this->sut->reserve($key, .0001, 100);
         $this->sut->insertIfKeyExists($key, 'kiwi');
-        $this->assertTrue($this->sut->exists($key, 'kiwi'));
+        self::assertTrue($this->sut->exists($key, 'kiwi'));
     }
 
     public function testInsertManyIfKeyExists(): void
@@ -81,8 +81,8 @@ class BloomFilterIntegrationTest extends IntegrationTestCase
         $key = 'insertManyIfKeyExistsTest';
         $this->sut->reserve($key, .0001, 100);
         $this->sut->insertManyIfKeyExists($key, ['pear', 'orange', 'banana']);
-        $this->assertTrue($this->sut->exists($key, 'orange'));
-        $this->assertFalse($this->sut->exists($key, 'pineapple'));
+        self::assertTrue($this->sut->exists($key, 'orange'));
+        self::assertFalse($this->sut->exists($key, 'pineapple'));
     }
 
     public function testInsertIfKeyExistsOnNonExistingKey(): void
@@ -101,9 +101,9 @@ class BloomFilterIntegrationTest extends IntegrationTestCase
     {
         $key = 'manyExistsTest';
         $this->sut->insertMany($key, ['pear', 'orange', 'banana']);
-        $this->assertEquals([true, true], $this->sut->manyExist($key, ['orange', 'banana']));
-        $this->assertEquals([false, false], $this->sut->manyExist($key, ['pineapple', 'strawberry']));
-        $this->assertEquals([false, true], $this->sut->manyExist($key, ['watermelon', 'orange']));
+        self::assertEquals([true, true], $this->sut->manyExist($key, ['orange', 'banana']));
+        self::assertEquals([false, false], $this->sut->manyExist($key, ['pineapple', 'strawberry']));
+        self::assertEquals([false, true], $this->sut->manyExist($key, ['watermelon', 'orange']));
     }
 
     public function testCopy(): void
@@ -115,6 +115,6 @@ class BloomFilterIntegrationTest extends IntegrationTestCase
             'copyTo',
             ['pear', 'orange', 'banana', 'pineapple', 'strawberry', 'watermelon']
         );
-        $this->assertEquals($expected, $returned);
+        self::assertEquals($expected, $returned);
     }
 }

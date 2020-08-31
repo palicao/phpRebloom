@@ -2,15 +2,15 @@
 
 Use [Redis Bloom](https://oss.redislabs.com/redisbloom/) with PHP!
 
-![Code Climate maintainability](https://img.shields.io/codeclimate/coverage-letter/palicao/phpRebloom?label=maintainability&logo=code-climate)
-![Code Climate coverage](https://img.shields.io/codeclimate/coverage/palicao/phpRebloom?logo=code-climate)
+[![Code Climate maintainability](https://img.shields.io/codeclimate/coverage-letter/palicao/phpRebloom?label=maintainability&logo=code-climate)](https://codeclimate.com/github/palicao/phpRebloom)
+[![Code Climate coverage](https://img.shields.io/codeclimate/coverage/palicao/phpRebloom?logo=code-climate)](https://codeclimate.com/github/palicao/phpRebloom)
 [![Build Status](https://travis-ci.com/palicao/phpRebloom.svg?branch=master)](https://travis-ci.com/palicao/phpRebloom)
 [![Latest Stable Version](https://img.shields.io/packagist/v/palicao/php-rebloom.svg)](https://packagist.org/packages/palicao/php-rebloom)
-![PHP version](https://img.shields.io/packagist/php-v/palicao/php-rebloom/0.1.0)
-![GitHub](https://img.shields.io/github/license/palicao/phpRebloom)
+[![PHP version](https://img.shields.io/packagist/php-v/palicao/php-rebloom/0.1.0)]((https://packagist.org/packages/palicao/php-rebloom))
+[![GitHub](https://img.shields.io/github/license/palicao/phpRebloom)](https://github.com/palicao/phpRebloom/blob/master/LICENSE)
 
-<small>Disclaimer: this is a very lightweight library. For a battery-included experience,
-please checkout: https://github.com/averias/phpredis-bloom</small>
+Disclaimer: this is a very lightweight library. For a battery-included experience,
+please checkout: https://github.com/averias/phpredis-bloom
 
 ## Install
 `composer require palicao/php-rebloom`
