@@ -21,7 +21,7 @@ services:
 before_install:
   - docker pull redislabs/rebloom:${REBLOOM_VERSION}
   - docker run -d -p 127.0.0.1:6379:6379 --name redis redislabs/rebloom:${REBLOOM_VERSION}
-  - yes | pecl install igbinary redis || true
+  - yes | pecl upgrade igbinary redis || true
   - echo 'extension = redis.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 before_script:
