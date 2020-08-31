@@ -1,5 +1,4 @@
 language: php
-
 dist: bionic
 
 php:
@@ -10,12 +9,17 @@ php:
 env:
   - REDIS_HOST=localhost REBLOOM_VERSION=2.2.0 # Redis 5.0.7
   - REDIS_HOST=localhost REBLOOM_VERSION=2.2.4 # Redis 6.0.5
+  - REDIS_HOST=localhost REBLOOM_VERSION=edge
+
+jobs:
+  allow_failures:
+    - env: REDIS_HOST=localhost REBLOOM_VERSION=edge
 
 services:
   - docker
 
 before_install:
-  - docker pull redislabs/rebloom:2.2.0
+  - docker pull redislabs/rebloom:${REBLOOM_VERSION}
   - docker run -d -p 127.0.0.1:6379:6379 --name redis redislabs/rebloom:${REBLOOM_VERSION}
   - yes | pecl install igbinary redis || true
   - echo 'extension = redis.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
@@ -23,7 +27,7 @@ before_install:
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
-  - if [ $(phpenv version-name) = "7.4" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then ./cc-test-reporter before-build; fi
+  - if [ $(phpenv version-name) = "7.4" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$REBLOOM_VERSION" == "2.2.4" ]; then ./cc-test-reporter before-build; fi
 
 script:
   - composer install
@@ -33,4 +37,4 @@ script:
 after_script:
   - docker stop redis
   - docker rm redis
-  - if [ $(phpenv version-name) = "7.4" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then ./cc-test-reporter after-build --coverage-input-type clover --id $CC_TEST_REPORTER_ID --exit-code $TRAVIS_TEST_RESULT; fi
+  - if [ $(phpenv version-name) = "7.4" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$REBLOOM_VERSION" == "2.2.4" ]; then ./cc-test-reporter after-build --coverage-input-type clover --id $CC_TEST_REPORTER_ID --exit-code $TRAVIS_TEST_RESULT; fi
