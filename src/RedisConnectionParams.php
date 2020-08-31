@@ -29,7 +29,12 @@ final class RedisConnectionParams
     /** @var string|null */
     private $password;
 
-
+    /**
+     * @param string $host
+     * @param int $port
+     * @param string|null $username Only supported by Redis 6
+     * @param string|null $password
+     */
     public function __construct(string $host = '127.0.0.1', int $port = 6379, string $username = null, string $password = null)
     {
         $this->persistentConnection = false;

@@ -8,15 +8,15 @@ php:
   - 7.4
 
 env:
-  - REDIS_HOST=localhost REBLOM_VERSION=2.2.0 # Redis 5.0.7
-  - REDIS_HOST=localhost REBLOM_VERSION=2.2.4 # Redis 6.0.5
+  - REDIS_HOST=localhost REBLOOM_VERSION=2.2.0 # Redis 5.0.7
+  - REDIS_HOST=localhost REBLOOM_VERSION=2.2.4 # Redis 6.0.5
 
 services:
   - docker
 
 before_install:
   - docker pull redislabs/rebloom:2.2.0
-  - docker run -d -p 127.0.0.1:6379:6379 --name redis redislabs/rebloom:$REBLOOM_VERSION
+  - docker run -d -p 127.0.0.1:6379:6379 --name redis redislabs/rebloom:${REBLOOM_VERSION}
   - yes | pecl install igbinary redis || true
   - echo 'extension = redis.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
