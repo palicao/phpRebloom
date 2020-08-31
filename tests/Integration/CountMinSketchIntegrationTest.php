@@ -28,22 +28,22 @@ class CountMinSketchIntegrationTest extends IntegrationTestCase
     {
         $key = 'initByDim';
         $result = $this->sut->initByDimensions($key, 3000, 40);
-        $this->assertTrue($result);
+        self::assertTrue($result);
         $info = $this->sut->info($key);
-        $this->assertEquals($key, $info->getKey());
-        $this->assertEquals(3000, $info->getWidth());
-        $this->assertEquals(40, $info->getDepth());
+        self::assertEquals($key, $info->getKey());
+        self::assertEquals(3000, $info->getWidth());
+        self::assertEquals(40, $info->getDepth());
     }
 
     public function testInitByProbability(): void
     {
         $key = 'initByProb';
         $result = $this->sut->initByProbability($key, .001, .01);
-        $this->assertTrue($result);
+        self::assertTrue($result);
         $info = $this->sut->info($key);
-        $this->assertEquals($key, $info->getKey());
-        $this->assertEquals(2000, $info->getWidth());
-        $this->assertEquals(7, $info->getDepth());
+        self::assertEquals($key, $info->getKey());
+        self::assertEquals(2000, $info->getWidth());
+        self::assertEquals(7, $info->getDepth());
     }
 
     public function testIncrementBy(): void
@@ -53,11 +53,11 @@ class CountMinSketchIntegrationTest extends IntegrationTestCase
         $result1 = $this->sut->incrementBy($key, new Pair('a', 100), new Pair('b', 200));
         $result2 = $this->sut->incrementBy($key, new Pair('a', 20), new Pair('b', 10));
 
-        $this->assertTrue($result1);
-        $this->assertTrue($result2);
+        self::assertTrue($result1);
+        self::assertTrue($result2);
 
         $expected = [new Pair('a', 120), new Pair('b', 210)];
-        $this->assertEquals($expected, $this->sut->query($key, 'a', 'b'));
+        self::assertEquals($expected, $this->sut->query($key, 'a', 'b'));
     }
 
     public function testIncrementByOnNonExistingKey(): void
@@ -83,10 +83,10 @@ class CountMinSketchIntegrationTest extends IntegrationTestCase
         $this->sut->initByDimensions('destination', 3000, 40);
         $result = $this->sut->merge('destination', ['source1' => 3, 'source2' => 5]);
 
-        $this->assertTrue($result);
+        self::assertTrue($result);
 
         $expected = [new Pair('a', 130), new Pair('b', 60), new Pair('c', 150)];
-        $this->assertEquals($expected, $this->sut->query('destination', 'a', 'b', 'c'));
+        self::assertEquals($expected, $this->sut->query('destination', 'a', 'b', 'c'));
     }
 
     public function testMergeNonExistingKey(): void
@@ -104,7 +104,6 @@ class CountMinSketchIntegrationTest extends IntegrationTestCase
         $expected = new CountMinSketchInfo($key, 3000, 40, 30);
         $result = $this->sut->info($key);
 
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
-
 }

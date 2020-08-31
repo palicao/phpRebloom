@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Palicao\PhpRebloom;
 
+use Palicao\PhpRebloom\Exception\RedisAuthenticationException;
 use Palicao\PhpRebloom\Exception\RedisClientException;
 use Redis;
 use RedisException;
@@ -18,12 +19,12 @@ class RedisClient
     public function __construct(Redis $redis, RedisConnectionParams $connectionParams)
     {
         $this->redis = $redis;
-
         $this->connectionParams = $connectionParams;
     }
 
     /**
      * @throws RedisClientException
+     * @throws RedisAuthenticationException
      */
     private function connectIfNeeded(): void
     {
@@ -62,9 +63,13 @@ class RedisClient
                 $this->redis->getLastError() ?? 'unknown error'
             ));
         }
+
+        $this->authenticate($params->getUsername(), $params->getPassword());
     }
 
     /**
+     * @noinspection PhpDocRedundantThrowsInspection
+     *
      * @param array $params
      * @return mixed
      * @throws RedisException
@@ -73,9 +78,40 @@ class RedisClient
     public function executeCommand(array $params)
     {
         $this->connectIfNeeded();
-        // UNDOCUMENTED FEATURE: option 8 is REDIS_OPT_REPLY_LITERAL
+
         $value = (PHP_VERSION_ID < 70300) ? '1' : 1;
-        $this->redis->setOption(8, $value);
+        $this->redis->setOption(Redis::OPT_REPLY_LITERAL, $value);
+
         return $this->redis->rawCommand(...$params);
+    }
+
+    /**
+     * @param string|null $username
+     * @param string|null $password
+     * @throws RedisAuthenticationException
+     */
+    private function authenticate(?string $username, ?string $password): void
+    {
+        try {
+            if ($password) {
+                if ($username) {
+                    // Calling auth() with an array throws a TypeError in some cases
+                    /** @noinspection PhpMethodParametersCountMismatchInspection */
+                    $result = $this->redis->rawCommand('AUTH', $username, $password);
+                } else {
+                    /** @psalm-suppress PossiblyNullArgument */
+                    $result = $this->redis->auth($password);
+                }
+                if ($result === false) {
+                    throw new RedisAuthenticationException(sprintf(
+                        'Failure authenticating user %s', $username ?: 'default'
+                    ));
+                }
+            }
+        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (RedisException $e) {
+            throw new RedisAuthenticationException(sprintf(
+                'Failure authenticating user %s: %s', $username ?: 'default', $e->getMessage()
+            ));
+        }
     }
 }
