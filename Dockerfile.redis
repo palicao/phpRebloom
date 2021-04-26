@@ -1,0 +1,13 @@
+FROM ubuntu:xenial
+
+RUN apt-get update && \
+    apt-get install -y software-properties-common && \
+    add-apt-repository -y ppa:chris-lea/redis-server && \
+    apt-get update && \
+    apt-get install -yqq redis-server git build-essential cmake
+RUN git clone https://github.com/RedisBloom/RedisBloom.git && \
+    cd RedisBloom && \
+    git submodule update --init --recursive && \
+    make
+
+ENTRYPOINT ["redis-server", "--loadmodule", "/RedisBloom/redisbloom.so", "--protected-mode", "no"]

@@ -321,3 +321,9 @@ Returns a TopKInfo object containing information about size, with, depth and dec
 `TopK::info(string $key): TopKInfo`
 
 See https://oss.redislabs.com/redisbloom/TopK_Commands/#topkinfo.
+
+## T-Digest
+
+The T-Digest data structure can be used to estimate rank statistics such as the median, percentiles, cumulative distributions, as well as trimmed means with high accuracy, particularly near the tails (quantiles near 0 or 1). It can be included in the family of "Approximate Query Processing" Algorithms.
+
+

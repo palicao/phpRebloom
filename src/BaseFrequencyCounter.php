@@ -17,7 +17,7 @@ abstract class BaseFrequencyCounter
 
     /**
      * @param RedisException $exception
-     * @param string $key
+     * @param string|null $key
      * @throws RedisException
      * @throws KeyNotFoundException
      */
